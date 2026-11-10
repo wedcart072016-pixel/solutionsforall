@@ -1,0 +1,250 @@
+
+/* =========================================================
+   1. DESIGN TOKENS (kept identical to index.html)
+   ========================================================= */
+:root{
+  --gold:#b8965f; --gold2:#a07c48; --cream:#f5f0e8; --paper:#fcfbf9;
+  --ink:#1f1b17; --mut:#7d746b;
+  --serif:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --sans:'Jost', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* =========================================================
+   2. BASE STYLES
+   ========================================================= */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);font-weight:300;font-size:16px;line-height:1.75;color:var(--ink);background:var(--paper);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:.34em;text-transform:uppercase;color:var(--gold2)}
+h1,h2{font-family:var(--serif);font-weight:300;line-height:1.08}
+h1 em,h2 em{display:block;font-style:italic;color:var(--gold2)}
+
+/* Gold pill button and outline version */
+.btn{display:inline-block;padding:16px 36px;border-radius:99px;font-size:11.5px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;background:linear-gradient(135deg,#c5a56f,#a88650);color:#fff;box-shadow:0 10px 26px rgba(160,124,72,.3);transition:transform .3s}
+.btn.line{background:transparent;color:var(--ink);border:1px solid rgba(31,27,23,.3);box-shadow:none}
+@media(hover:hover){.btn:hover{transform:translateY(-2px)}}
+
+/* =========================================================
+   3. NAVIGATION
+   On this page the bar is always the solid floating style,
+   because the top of the page is light (no dark hero photo).
+   ========================================================= */
+#nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:calc(14px + env(safe-area-inset-top,0px)) 24px 0}
+.bar{display:flex;align-items:center;justify-content:space-between;height:68px;padding:0 36px;background:rgba(252,251,249,.95);backdrop-filter:blur(12px);border-radius:32px;box-shadow:0 12px 40px rgba(0,0,0,.08)}
+.logo{font-family:var(--serif);font-size:30px;font-weight:400;letter-spacing:.03em}
+.links{display:flex;gap:42px}
+/* Desktop: logo | links | button in three columns, so the links sit exactly in the page centre
+   (lined up with the centred label under the bar) whatever the widths of the logo and button */
+@media(min-width:901px){.bar{display:grid;grid-template-columns:1fr auto 1fr}.bar>.logo{justify-self:start}.bar>.navcta{justify-self:end}}
+.links a{font-size:12px;font-weight:400;letter-spacing:.24em;text-transform:uppercase;padding:6px 0;border-bottom:1px solid transparent}
+.links a.on{border-color:var(--gold);color:var(--gold2)}
+.navcta{padding:13px 28px;border-radius:99px;font-size:11.5px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;background:linear-gradient(135deg,#c5a56f,#a88650);color:#fff;box-shadow:0 8px 20px rgba(160,124,72,.3)}
+
+/* Mobile menu button and dropdown (same behaviour as the homepage) */
+.menu-btn{display:none;width:44px;height:44px;border:0;background:none;color:inherit;cursor:pointer;position:relative}
+.menu-btn span,.menu-btn:before,.menu-btn:after{content:"";position:absolute;left:11px;width:22px;height:1.5px;background:currentColor;transition:.3s}
+.menu-btn:before{top:15px}.menu-btn span{top:21px}.menu-btn:after{top:27px}
+#nav.open .menu-btn:before{top:21px;transform:rotate(45deg)}
+#nav.open .menu-btn:after{top:21px;transform:rotate(-45deg)}
+#nav.open .menu-btn span{opacity:0}
+.mpanel{display:none}
+
+/* =========================================================
+   4. PAGE HEADER (title and intro)
+   ========================================================= */
+.head{background:var(--cream);text-align:center;padding:190px 0 90px; margin-bottom: 100px}
+.head h1{font-size:clamp(40px,6vw,76px);margin:18px 0 26px}
+.head p{max-width:620px;margin:0 auto;color:var(--mut);font-size:17px}
+/* Small scroll hint under the intro */
+.scroll-hint{display:inline-block;margin-top:40px;width:1px;height:48px;background:linear-gradient(var(--gold),transparent)}
+
+/* =========================================================
+   5. FILTER TABS (All / Weddings / Celebrations)
+   ========================================================= */
+.filters{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:70px 0 56px}
+.filters button{padding:12px 26px;border-radius:99px;border:1px solid rgba(184,150,95,.4);background:transparent;cursor:pointer;font-size:11.5px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);transition:.3s}
+.filters button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* =========================================================
+   6. DESIGN CARDS
+   Each card: a cream tile with a phone preview, a category badge,
+   Preview/Details buttons (appear on hover on desktop), then the
+   name, a one line description, the package, and two links.
+   ========================================================= */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:48px 32px;padding-bottom:110px}
+.item[hidden]{display:none}
+
+.tile{position:relative;height:560px;border-radius:20px;background:var(--cream);overflow:hidden;display:flex;align-items:center;justify-content:center}
+/* Category badge in the top left corner */
+.badge{position:absolute;top:18px;left:18px;z-index:4;padding:7px 14px;border-radius:99px;background:rgba(252,251,249,.9);font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2)}
+
+/* Phone frame showing the design screenshot */
+.phone{position:relative;width:228px;height:470px;border:8px solid #0c0c0c;border-radius:40px;overflow:hidden;background:#ddd;box-shadow:0 26px 50px rgba(60,40,20,.22);transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.phone:before{content:"";position:absolute;top:8px;left:50%;width:74px;height:20px;margin-left:-37px;background:#000;border-radius:12px;z-index:3} /* notch */
+.phone img{width:100%;height:100%;object-fit:cover;object-position:top}
+/* Striped placeholder for designs without a screenshot yet */
+.ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(70,55,35,.65);background:repeating-linear-gradient(45deg,#ebe3d6,#ebe3d6 14px,#e4dbcc 14px,#e4dbcc 28px)}
+
+/* Preview and Details buttons over the tile */
+.actions{position:absolute;left:0;right:0;bottom:22px;z-index:4;display:flex;justify-content:center;gap:10px;opacity:0;transform:translateY(10px);transition:.35s}
+.actions a{padding:12px 24px;border-radius:99px;font-size:10.5px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;background:rgba(252,251,249,.95);color:var(--ink);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.actions a:first-child{background:var(--ink);color:#fff}
+@media(hover:hover){
+  .tile:hover .actions{opacity:1;transform:none}
+  .tile:hover .phone{transform:translateY(-10px)}
+}
+
+/* Text under the tile */
+.info{padding:22px 4px 0}
+.info h3{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.15}
+.info p{color:var(--mut);font-size:15px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tier .price{text-transform:none;letter-spacing:.06em;font-size:12.5px}
+.tier{margin-top:10px;font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2)}
+.links2{display:flex;gap:22px;margin-top:14px}
+.links2 a{font-size:11.5px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid rgba(184,150,95,.5)}
+
+/* Whole tile opens the live preview */
+.tile{cursor:pointer}
+.tile button.phone{display:block;padding:0;cursor:pointer;font:inherit}
+
+/* =========================================================
+   6b. LIVE PREVIEW (phone frame on desktop, full screen on phones)
+   ========================================================= */
+.pv{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;gap:56px;padding:24px;
+  background:rgba(26,22,18,.78);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s}
+.pv.on{opacity:1;visibility:visible;transition:opacity .35s}
+.pv-box{position:relative;flex:none}
+.pv-phone{position:absolute;left:0;top:0;width:418px;height:872px;padding:14px;border-radius:58px;
+  background:linear-gradient(145deg,#2b231d,#0f0c0a);box-shadow:0 50px 100px -40px rgba(0,0,0,.8),inset 0 0 0 1.5px rgba(255,255,255,.08),0 0 0 1px #000}
+
+.pv-screen{position:fixed;left:0;top:0;width:390px;height:844px;border:0;border-radius:44px;background:#fff;z-index:1}
+.pv-phone:before{z-index:3}
+.pv-notch{position:fixed;z-index:2;height:32px;border-radius:99px;background:#000;pointer-events:none}
+.pv-side{max-width:320px;color:#fff}
+.pv-side .eyebrow{color:#e8d3aa}
+.pv-side h2{font-size:64px;margin:10px 0 6px}
+.pv-side .look{font-family:var(--serif);font-style:italic;font-size:22px;color:rgba(255,255,255,.75)}
+.pv-side .tip{margin-top:14px;font-size:14px;color:rgba(255,255,255,.6)}
+.pv-side .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.pv-side .btn.line{color:#fff;border-color:rgba(255,255,255,.45)}
+.pv-side .nav2{display:flex;gap:10px;margin-top:12px}
+.pv-side .nav2 button{flex:1;padding:12px 18px;border-radius:99px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+.pv-x{position:absolute;top:18px;right:18px;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.2);color:#fff;font-size:24px;cursor:pointer;z-index:2}
+.pv-bar,.pv-full{display:none}
+/* "Opening invitation…" while the card loads */
+.pv-loading{position:fixed;left:50%;bottom:28px;z-index:5;display:none;align-items:center;gap:10px;transform:translateX(-50%);margin:0;padding:10px 18px;border-radius:99px;background:rgba(253,250,244,.94);color:#6b5a45;font:500 13px/1 Jost,sans-serif;letter-spacing:.06em;box-shadow:0 8px 24px -10px rgba(0,0,0,.35);pointer-events:none}
+.pv.on .pv-loading.show{display:flex}
+.pv-loading i{width:14px;height:14px;border:2px solid rgba(107,90,69,.25);border-top-color:#6b5a45;border-radius:50%;animation:pvspin .8s linear infinite}
+@keyframes pvspin{to{transform:rotate(360deg)}}
+@media(max-width:760px){
+  .pv{padding:0;gap:0;background:#000}
+  .pv-box,.pv-side,.pv-x,.pv-screen,.pv-notch{display:none}
+  .pv-bar{display:flex;position:absolute;inset:0 0 auto;z-index:2;height:52px;align-items:center;justify-content:space-between;padding:0 16px;background:#1a1612;color:#fff;font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase}
+  .pv-bar button{border:0;background:none;color:inherit;font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer}
+  .pv-bar a{color:#e8d3aa}
+  .pv-full{display:block;position:absolute;inset:52px 0 0;width:100%;height:calc(100% - 52px);border:0;background:#fff}
+}
+
+/* =========================================================
+   7. HELP BANNER ("Not sure which design suits you?")
+   ========================================================= */
+/* Candlelit background with a glowing card whose gold border light travels around it */
+.help{position:relative;overflow:hidden;text-align:center;padding:110px 0;background:#201d18}
+.help>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.help:before{content:"";position:absolute;inset:0;background:rgba(32,29,24,.85);z-index:1}
+.help .aurora{position:absolute;left:50%;top:50%;width:30rem;height:30rem;margin:-15rem 0 0 -15rem;border-radius:50%;background:rgba(184,150,95,.12);filter:blur(90px);z-index:1;pointer-events:none;animation:aurora 16s ease-in-out infinite alternate}
+@keyframes aurora{from{transform:translate3d(-6%,-4%,0) scale(1)}to{transform:translate3d(6%,6%,0) scale(1.15)}}
+.help .wrap{position:relative;z-index:2}
+.ctacard{position:relative;max-width:720px;margin:0 auto;padding:1px;border-radius:26px;overflow:hidden;box-shadow:0 40px 90px -45px rgba(154,123,69,.5)}
+.conic{position:absolute;inset:-100%;background:conic-gradient(transparent 0deg,rgba(176,141,87,.85) 40deg,rgba(253,243,221,.95) 60deg,rgba(176,141,87,.85) 80deg,transparent 120deg,transparent 360deg);animation:spin 7s linear infinite;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ctain{position:relative;border-radius:25px;padding:60px 50px;background:linear-gradient(180deg,rgba(245,240,232,.96),#fff)}
+.help h2{font-size:clamp(34px,4.6vw,52px);margin:16px 0 18px;text-wrap:balance}
+.help p{max-width:520px;margin:0 auto 32px;color:var(--mut)}
+@media(prefers-reduced-motion:reduce){.conic,.help .aurora{animation:none}}
+
+/* =========================================================
+   8. FOOTER (same as homepage)
+   ========================================================= */
+/* Footer (same as the home page) */
+.socials{display:flex;gap:10px;justify-content:center;margin-top:26px}
+.socials a{width:40px;height:40px;border:1px solid rgba(125,116,107,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--mut);transition:.3s}
+.socials svg{width:17px;height:17px}
+@media(hover:hover){.socials a:hover{background:var(--gold);border-color:var(--gold);color:#fff}}
+/* Light footer, like the rest of the page */
+footer{background:var(--cream);border-top:1px solid rgba(184,150,95,.25);color:var(--mut);padding:76px 0 34px;font-size:14px}
+.fg{display:grid;grid-template-columns:5fr 3fr 2fr 2.4fr;gap:44px}
+footer p{max-width:280px}
+footer h4{color:var(--mut);font-size:11px;letter-spacing:.3em;text-transform:uppercase;margin-bottom:20px;font-weight:400}
+footer li{list-style:none;margin-bottom:12px}
+footer ul a{color:#5b534b;transition:color .3s}
+@media(hover:hover){footer ul a:hover{color:var(--gold2)}}
+footer .logo{color:var(--ink);margin-bottom:14px;display:block}
+footer .socials{justify-content:flex-start;margin-top:4px}
+.orn{display:flex;align-items:center;justify-content:center;gap:12px;margin:56px 0 24px}
+.orn span{width:80px;height:1px;background:linear-gradient(90deg,transparent,rgba(184,150,95,.6))}
+.orn span+i+span,.orn span:last-child{background:linear-gradient(90deg,rgba(184,150,95,.6),transparent)}
+.orn i{width:6px;height:6px;background:var(--gold);transform:rotate(45deg)}
+.owner{max-width:none;text-align:center;font-size:12.5px;color:#5b534b}
+.copy{margin-top:10px;display:flex;justify-content:center;flex-wrap:wrap;gap:8px 22px;font-size:12px}
+.copy a{border-bottom:1px solid rgba(184,150,95,.4)}
+/* Phones: copyright on its own line, the two links together below it */
+@media(max-width:600px){.copy span{flex-basis:100%;text-align:center}}
+@media(max-width:900px){.fg{grid-template-columns:1fr 1fr;gap:36px}.fg>div:first-child{grid-column:1/-1}}
+
+/* =========================================================
+   9. RESPONSIVE (phones first priority)
+   ========================================================= */
+/* Tablets: two cards per row, mobile menu */
+@media(max-width:1000px){
+  .grid{grid-template-columns:1fr 1fr;gap:40px 24px}
+}
+@media(max-width:900px){
+  .wrap{padding:0 20px}
+  #nav{padding:calc(10px + env(safe-area-inset-top,0px)) 12px 0}
+  .bar{height:60px;padding:0 12px 0 20px;border-radius:30px}
+  .logo{font-size:26px}
+  .links{display:none}
+  .menu-btn{display:block}
+  .navcta{padding:11px 20px;font-size:10.5px}
+  .mpanel{display:flex;flex-direction:column;margin:8px 0 0;padding:0 24px;background:rgba(252,251,249,.98);border-radius:24px;box-shadow:0 16px 40px rgba(0,0,0,.14);max-height:0;overflow:hidden;opacity:0;transition:max-height .4s,opacity .3s,padding .4s}
+  #nav.open .mpanel{max-height:420px;opacity:1;padding:18px 24px 24px}
+  .mpanel a{padding:14px 0;border-bottom:1px solid rgba(184,150,95,.2);font-size:13px;letter-spacing:.22em;text-transform:uppercase}
+  .mpanel .btn{margin-top:14px;text-align:center;border-bottom:0}
+  /* Touch screens: always show the Preview/Details buttons */
+  .actions{opacity:1;transform:none}
+}
+/* Phones: one card per row */
+@media(max-width:600px){
+  .bar .navcta{display:none}
+  .head{padding:130px 0 64px}
+  .head p{font-size:16px}
+  .filters{margin:44px 0 36px;gap:8px}
+  .filters button{padding:11px 18px;font-size:10.5px;letter-spacing:.16em}
+  .grid{grid-template-columns:1fr;gap:44px;padding-bottom:80px}
+  .tile{height:520px}
+  .phone{width:220px;height:452px}
+  .info h3{font-size:28px}
+  .help{padding:84px 0}
+  .ctain{padding:44px 24px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .phone,.actions,.btn{transition:none}
+}
+
+/* Floating WhatsApp button (gold, like the rest of the site) */
+.wa-float{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:90;display:flex;align-items:center;gap:10px;height:56px;padding:0 20px 0 16px;border-radius:99px;
+  background:linear-gradient(135deg,#c5a56f,#a88650);color:#fff;box-shadow:0 14px 30px -10px rgba(120,90,45,.6),0 0 0 1px rgba(255,255,255,.25) inset;
+  font-size:11.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;transition:transform .3s,box-shadow .3s}
+.wa-float svg{width:26px;height:26px;flex:none}
+@media(hover:hover){.wa-float:hover{transform:translateY(-3px);box-shadow:0 18px 36px -12px rgba(120,90,45,.7)}}
+@media(max-width:600px){.wa-float{width:56px;padding:0;justify-content:center}.wa-float span{display:none}footer{padding-bottom:96px}}
+/* Hidden while a full-screen template preview is open */
+body:has(.pv.on) .wa-float{display:none}

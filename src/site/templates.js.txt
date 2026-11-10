@@ -1,0 +1,135 @@
+
+/* =========================================================
+   TEMPLATES LIST  (edit this to add, remove, or reorder templates)
+   slug  : folder name under invitations/ (the live invitation lives at invitations/<slug>/)
+   name  : template name shown on the card
+   event : "Full wedding", "Nikkah", "Barat" or "Walima" (used by the filter tabs)
+   text  : one SHORT line describing the look (about 40 characters, so it stays on one line
+           and the buttons of every card in a row line up)
+   The card image is images/designs/<slug>.webp (the template's opening screen).
+   ========================================================= */
+const PRICE = "Rs. 5,000";   // one price for every template (also set in order and on the home page)
+const DESIGNS = [
+  { slug:"olive",   name:"Olive",   event:"Full wedding", text:"Olive leaves, a chandelier and linen" },
+  { slug:"bloom",   name:"Bloom",   event:"Full wedding", text:"A camellia blooms into swaying garlands" },
+];
+
+const orderLink = d => `/order?design=${encodeURIComponent(d.name)}`;
+
+/* ---------- Build one card for each template ---------- */
+const grid = document.getElementById('grid');
+grid.innerHTML = DESIGNS.map((d, i) => `
+  <article class="item" data-category="${d.event}">
+    <div class="tile" data-pv="${i}">
+      <span class="badge">${d.event}</span>
+      <button class="phone" type="button" data-pv="${i}" aria-label="Live preview of ${d.name}">
+        <img src="/images/designs/${d.slug}.webp" alt="${d.name} invitation template" ${i < 3 ? 'fetchpriority="high"' : 'loading="lazy"'}>
+      </button>
+      <div class="actions">
+        <a href="/invitations/${d.slug}/" data-pv="${i}">Live preview</a>
+        <a href="${orderLink(d)}">Order</a>
+      </div>
+    </div>
+    <div class="info">
+      <h3>${d.name}</h3>
+      <p>${d.text}</p>
+      <div class="links2"><a href="/invitations/${d.slug}/" data-pv="${i}">Live preview</a></div>
+    </div>
+  </article>`).join('');
+
+/* ---------- Live preview ---------- */
+const pv = document.getElementById('pv');
+const pvFrame = document.getElementById('pvFrame');
+const pvFull = document.getElementById('pvFull');
+const small = () => matchMedia('(max-width:760px)').matches;
+const notch = document.createElement('div'); notch.className = 'pv-notch'; pv.appendChild(notch);
+let pvIndex = -1;
+function fitPhone(){
+  const s = Math.min(1, (innerHeight - 48) / 872, (innerWidth - 440) / 418);
+  const phone = document.getElementById('pvPhone'), box = document.getElementById('pvBox');
+  const k = Math.max(.45, s);
+  phone.style.zoom = k;
+  box.style.width = 418 * k + 'px'; box.style.height = 872 * k + 'px';
+  // Lay the live screen and the notch over the bezel
+  const r = box.getBoundingClientRect();
+  pvFrame.style.zoom = k;
+  pvFrame.style.left = (r.left + 14 * k) / k + 'px';
+  pvFrame.style.top = (r.top + 14 * k) / k + 'px';
+  notch.style.left = r.left + r.width / 2 - 59 * k + 'px';
+  notch.style.top = r.top + 26 * k + 'px';
+  notch.style.width = 118 * k + 'px';
+  notch.style.height = 32 * k + 'px';
+}
+function openPreview(i){
+  pvIndex = (i + DESIGNS.length) % DESIGNS.length;
+  const d = DESIGNS[pvIndex], url = `/invitations/${d.slug}/`;
+  document.getElementById('pvName').textContent = document.getElementById('pvBarName').textContent = d.name;
+  document.getElementById('pvEvent').textContent = d.event;
+  document.getElementById('pvLook').textContent = d.text;
+  document.getElementById('pvOrder').href = document.getElementById('pvBarOrder').href = orderLink(d);
+  document.getElementById('pvOpen').href = url;
+  pv.classList.add('on'); pv.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+  // Show the template's opening screen at once, while the live invitation loads behind it
+  const target = small() ? pvFull : pvFrame;
+  target.style.background = `#f3ede1 url(/images/designs/${d.slug}.webp) center top / cover no-repeat`;
+  const loading = document.getElementById('pvLoading');
+  loading.classList.add('show');
+  const done = () => loading.classList.remove('show');
+  target.addEventListener('load', done, { once: true });
+  clearTimeout(window.__pvLoadTimer); window.__pvLoadTimer = setTimeout(done, 20000);
+  target.src = url;
+  (small() ? pvFrame : pvFull).removeAttribute('src');
+  fitPhone();
+  history.replaceState(null, '', `?preview=${d.slug}`);
+}
+function closePreview(){
+  pv.classList.remove('on'); pv.setAttribute('aria-hidden','true');
+  document.getElementById('pvLoading').classList.remove('show');
+  document.body.style.overflow = '';
+  setTimeout(() => { pvFrame.removeAttribute('src'); pvFull.removeAttribute('src'); }, 350);
+  history.replaceState(null, '', '/templates');
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-pv]');
+  if (!t) return;
+  e.preventDefault();
+  openPreview(+t.dataset.pv);
+});
+document.getElementById('pvX').onclick = closePreview;
+document.getElementById('pvBack').onclick = closePreview;
+pv.addEventListener('click', e => { if (e.target === pv) closePreview(); });
+document.getElementById('pvPrev').onclick = () => openPreview(pvIndex - 1);
+document.getElementById('pvNext').onclick = () => openPreview(pvIndex + 1);
+document.getElementById('pvRestart').onclick = () => { pvFrame.src = pvFrame.src; };
+addEventListener('keydown', e => {
+  if (!pv.classList.contains('on')) return;
+  if (e.key === 'Escape') closePreview();
+  if (e.key === 'ArrowRight') openPreview(pvIndex + 1);
+  if (e.key === 'ArrowLeft') openPreview(pvIndex - 1);
+});
+addEventListener('resize', () => pv.classList.contains('on') && fitPhone());
+const want = new URLSearchParams(location.search).get('preview');
+if (want && DESIGNS.some(d => d.slug === want)) openPreview(DESIGNS.findIndex(d => d.slug === want));
+
+/* ---------- Filter tabs: show only the chosen category ---------- */
+const buttons = document.querySelectorAll('.filters button');
+buttons.forEach(btn => btn.addEventListener('click', () => {
+  buttons.forEach(b => b.classList.toggle('on', b === btn));
+  const f = btn.dataset.filter;
+  document.querySelectorAll('.item').forEach(item => {
+    item.hidden = !(f === 'all' || item.dataset.category === f);
+  });
+}));
+
+/* ---------- Mobile menu: open and close ---------- */
+const nav = document.getElementById('nav');
+const menuBtn = document.getElementById('menuBtn');
+const setMenu = open => {
+  if (!nav || !menuBtn) return;
+  nav.classList.toggle('open', open);
+  menuBtn.setAttribute('aria-expanded', open);
+  menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+};
+if (menuBtn && nav) menuBtn.onclick = () => setMenu(!nav.classList.contains('open'));
+document.querySelectorAll('#mpanel a').forEach(a => a.addEventListener('click', () => setMenu(false)));

@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Keep real static files (including /invitations/<slug>/) intact, but let
+# client-side application routes fall back to the Vue entry point. This is a
+# rewrite (HTTP 200), so it does not change the browser URL or redirect to
+# wedpk.com.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
